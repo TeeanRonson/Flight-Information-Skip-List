@@ -1,7 +1,8 @@
 package skipLists;
 
 /**
- * Represents data in the FlightNode. Contains the flight number and the price
+ * Represents data in the FlightNode. Contains the flight number and the flight price
+ * Private data members for both
  */
 public class FlightData {
 
@@ -19,7 +20,7 @@ public class FlightData {
 	}
 
 	/**
-	 * Returns the number of the flight
+	 * Returns the flight number
 	 * @return flight number
 	 */
 	public String getFlightNumber() {
@@ -27,13 +28,18 @@ public class FlightData {
 	}
 
 	/**
-	 * Returns the price of the flight
+	 * Returns the flight price
 	 * @return price
 	 */
 	public double getPrice() {
 		return this.price;
 	}
 
+	/**
+	 * Returns a string representation of the flight number
+	 * and price
+	 * @return
+	 */
 	public String toString() {
 		String dataResult = this.flightNum + " " + this.price;
 		return dataResult;

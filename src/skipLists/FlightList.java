@@ -14,19 +14,24 @@ import java.util.Random;
 import java.util.Date;
 
 
-/** The class that represents the flight database using a skip list */
+/** The class that represents the flight database using a skip list
+ *  Stores several private data members
+ *  Including:
+ *  head of the list
+ *  tail of the list
+ *  dummy keys negInfi and posInfi
+ *  dummy data dummyData
+ *  height of the list
+ */
+
 public class FlightList {
 
 	private FlightNode head;
 	private FlightNode tail;
-
 	private FlightKey negInfi;
 	private FlightKey posInfi;
 	private FlightData dummyData;
-
 	private Integer height;
-	private Integer elements;
-
 
 
 	/** Default constructor */
@@ -34,10 +39,7 @@ public class FlightList {
 		this.negInfi = new FlightKey("A", "A", "00/00", "00:00");
 		this.posInfi = new FlightKey("Z", "Z", "32/13", "00:00");
 		this.dummyData = new FlightData("0", 00);
-
 		this.height = 1;
-		this.elements = 0;
-
 		this.head = new FlightNode(this.negInfi, this.dummyData);
 		this.tail = new FlightNode(this.posInfi, this.dummyData);
 		this.head.setNext(this.tail);
@@ -47,17 +49,14 @@ public class FlightList {
 
 	/**
 	 * Constructor.
-	 * Reads flight data from the file and inserts it into this skip list.
-	 * @param filename the name of he file
+	 * Reads flight data from the file and inserts it into the skip list.
+	 * @param filename the name of the file
 	 */
 	public FlightList(String filename) {
 		this.negInfi = new FlightKey("A", "A", "00/00", "00:00");
 		this.posInfi = new FlightKey("Z", "Z", "32/13", "00:00");
 		this.dummyData = new FlightData("0", 00);
-
 		this.height = 1;
-		this.elements = 0;
-
 		this.head = new FlightNode(this.negInfi, this.dummyData);
 		this.tail = new FlightNode(this.posInfi, this.dummyData);
 		this.head.setNext(this.tail);
@@ -84,20 +83,16 @@ public class FlightList {
 				FlightKey key = new FlightKey(origin, dest, date, time);
 				FlightData data = new FlightData(flight, price);
 				insert(key, data);
-
 			}
-
-
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.out.println("File Input Unsuccessful");
 		}
-
 	}
 
 	/**
 	 * Returns true if the node with the given key exists in the skip list,
-	 * false otherwise. This method needs to be efficient.
+	 * false otherwise.
 	 *
 	 * @param key flight key
 	 * @return true if the key is in the skip list, false otherwise
@@ -105,11 +100,6 @@ public class FlightList {
 	public boolean find(FlightKey key) {
 
 		FlightNode current = this.head;
-
-//		System.out.println("Checking heights: " + this.height);
-//		System.out.println("****");
-//		print();
-//		System.out.println("****");
 
 		while(current != null && current.getNext() != null && current.getKey().compareTo(tail.getKey()) != 0) {
 
@@ -124,13 +114,16 @@ public class FlightList {
 			} else if (nextKey.compareTo(key) < 0) {
 				current = current.getNext();
 			}
-
 		}
-
 		return false;
 	}
 
 
+	/**
+	 * Private method checks the height of the newly created node
+	 * @param node
+	 * @return the height of the newly created node
+	 */
 	private int findHeight(FlightNode node) {
 
 		int level = 0;
@@ -142,7 +135,15 @@ public class FlightList {
 		return level;
 	}
 
-
+	/**
+	 * Private method used to calculate the height of the newly created node
+	 * Probability of 0.5 used as a threshold to measure if we increase
+	 * the height value
+	 *
+	 * Consecutive probabilities less than 0.5 adds to height
+	 * Probability greater than 0.5 ends the process
+	 * @return
+	 */
 	private int randLevel() {
 
 		int result = 0;
@@ -155,6 +156,12 @@ public class FlightList {
 	}
 
 
+	/**
+	 * Private method creates the tower of the newly created node
+	 * The height of the tower will depend on the randLevel() method
+	 * @param node
+	 * @return
+	 */
 	private FlightNode createTower(FlightNode node) {
 
 		int levels = randLevel();
@@ -172,6 +179,15 @@ public class FlightList {
 		return node;
 	}
 
+	/**
+	 * Private method called when needing to create a new level
+	 * in the skip list
+	 *
+	 * Connects the new level with the existing level at the head
+	 * and at the tail
+	 * @param newHead
+	 * @param newTail
+	 */
 	private void connectNewList(FlightNode newHead, FlightNode newTail) {
 
 		this.head.setUp(newHead);
@@ -181,6 +197,12 @@ public class FlightList {
 		newHead.setNext(newTail);
 	}
 
+	/**
+	 * Private method adds a new node to the given position when
+	 * found in the skip list
+	 * @param current
+	 * @param newNode
+	 */
 	private void addNew(FlightNode current, FlightNode newNode) {
 
 		FlightNode next = current.getNext();
@@ -192,6 +214,14 @@ public class FlightList {
 
 	}
 
+
+	/**
+	 * Private method finds the position in which to insert the new node
+	 * @param current
+	 * @param levels
+	 * @param newNode
+	 * @return true if it has been sucessfully added
+	 */
 	private boolean addNewNode(FlightNode current, int levels, FlightNode newNode) {
 
 		while(current != null && current.getNext() != null && levels > 0) {
@@ -222,11 +252,9 @@ public class FlightList {
 	 */
 	public boolean insert(FlightKey key, FlightData data) {
 
-
 		FlightNode newNode = new FlightNode(key, data);
 		newNode = createTower(newNode);
 		int levels = findHeight(newNode);
-//		System.out.println("Levels of newNode: " + levels + " for " + key + " " + data);
 
 		if (find(key) == true) {
 			System.out.println("Key already exists");
@@ -234,50 +262,26 @@ public class FlightList {
 		}
 
 		if (levels <= this.height) {
-
 			int difference = this.height - levels;
-
 			FlightNode current = this.head;
 
-			// Traverse down the levels until we are at the level of the newNode height
 			if (difference > 0) {
-
 				while (current != null && current.getNext() != null && difference > 0) {
 					FlightKey nextKey = current.getNext().getKey();
-
 					if (nextKey.compareTo(newNode.getKey()) < 0) {
 						current = current.getNext();
 					} else if (nextKey.compareTo(newNode.getKey()) > 0) {
 						current = current.getDown();
 						difference--;
 					}
-
 				}
 			}
-
 			boolean added = addNewNode(current, levels, newNode);
 			return added;
 
-//			while (current != null && current.getNext() != null && levels > 0) {
-//				FlightKey nextNode = current.getNext().getKey();
-//
-//				if (nextNode.compareTo(newNode.getKey()) < 0) {
-//					current = current.getNext();
-//				} else if (nextNode.compareTo(newNode.getKey()) > 0) {
-//					addNew(current, newNode);
-//					newNode = newNode.getDown();
-//					current = current.getDown();
-//					levels--;
-//				}
-//
-//			}
-
 		} else {
-			// Levels of the new Node exceed the height
-
 			int difference = levels - this.height;
-//
-			// We first create the additional levels by adding new negInfi and posInfi nodes
+
 			while(difference > 0) {
 				FlightNode newHead = new FlightNode(this.negInfi, this.dummyData);
 				FlightNode newTail = new FlightNode(this.posInfi, this.dummyData);
@@ -292,28 +296,19 @@ public class FlightList {
 			boolean added = addNewNode(current, remainderLevels, newNode);
 			return added;
 		}
-
-//		while(current != null && current.getNext() != null && remainderLevels > 0) {
-//
-//				FlightKey nextNode = current.getNext().getKey();
-//
-//				if (nextNode.compareTo(newNode.getKey()) < 0) {
-//					current = current.getNext();
-//				} else if (nextNode.compareTo(newNode.getKey()) > 0) {
-//					addNew(current, newNode);
-//					newNode = newNode.getDown();
-//					current = current.getDown();
-//					remainderLevels--;
-//				}
-//
-//			}
 	}
 
+
+	/**
+	 * Private method that adds the successors to a flight to an ArrayList
+	 * @param result
+	 * @param current
+	 * @param key
+	 * @return ArrayList of successor flights
+	 */
 	private ArrayList<FlightNode> successorsResult(ArrayList<FlightNode> result, FlightNode current, FlightKey key) {
 
 		while (current.getNext().getKey().matchInfoS(key) == true && current.getNext() != null) {
-
-			System.out.println("printing key: " + current.getNext().getKey());
 			result.add(current.getNext());
 			current = current.getNext();
 		}
@@ -338,24 +333,19 @@ public class FlightList {
 		while (current != null && current.getNext() != null && current.getKey().compareTo(tail.getKey()) != 0) {
 
 			FlightKey nextKey = current.getNext().getKey();
-			System.out.println("Current key: " + current.getKey());
-			System.out.println("Next key: " + nextKey);
 
 			if (nextKey.compareTo(key) < 0) {
-				System.out.println("Get Next");
 				current = current.getNext();
 				continue;
 			}
 
 			if (nextKey.compareTo(key) > 0 && height != 1) {
-				System.out.println("Get Down");
 				current = current.getDown();
 				height--;
 				continue;
 			}
 
 			if (nextKey.compareTo(key) == 0) {
-				System.out.println("Arrived and Get Next");
 				current = current.getNext();
 				while (height != 1) {
 					current = current.getDown();
@@ -365,31 +355,24 @@ public class FlightList {
 			}
 
 			if (nextKey.compareTo(key) > 0 && height == 1) {
-				System.out.println("Arrived and break");
-				System.out.println("Current Key is: " + current.getKey());
-				System.out.println("The next key is correct: " + current.getNext().getKey());
 				break;
 			}
 		}
-
-//		while (current.getNext().getKey().matchInfoS(key) == true && current.getNext() != null) {
-//
-//			System.out.println("printing key: " + current.getNext().getKey());
-//			result.add(current.getNext());
-//			current = current.getNext();
-//		}
-//
-//		return result;
 		return successorsResult(result, current, key);
 	}
 
-	private ArrayList<FlightNode> predeccesorsResult(ArrayList<FlightNode> result, FlightNode current, FlightKey key) {
+	/**
+	 * Private method adds the predecessor flights to an ArrayList.
+	 * @param result
+	 * @param current
+	 * @param key
+	 * @return ArrayList of predecessor flights
+	 */
+	private ArrayList<FlightNode> predecessorsResult(ArrayList<FlightNode> result, FlightNode current, FlightKey key) {
 
 		ArrayList<FlightNode> temp = new ArrayList<FlightNode>();
 
 		while (current.getPrevious().getKey().matchInfoP(key) == true && current.getPrevious() != null) {
-
-			System.out.println("printing key: " + current.getPrevious().getKey());
 			temp.add(current.getPrevious());
 			current = current.getPrevious();
 		}
@@ -412,66 +395,39 @@ public class FlightList {
 	public ArrayList<FlightNode> predecessors(FlightKey key, int timeFrame) {
 
 		ArrayList<FlightNode> result = new ArrayList<FlightNode>();
-
 		FlightNode current = this.head;
 		int height = this.height;
-		System.out.println(height);
 
 		while (current != null && current.getNext() != null && current.getKey().compareTo(tail.getKey()) != 0) {
 
 			FlightKey nextKey = current.getNext().getKey();
-			System.out.println("Current key: " + current.getKey());
-			System.out.println("Next key: " + nextKey);
 
 			if (nextKey.compareTo(key) < 0) {
-				System.out.println("Get Next");
 				current = current.getNext();
 				continue;
 			}
 
 			if (nextKey.compareTo(key) > 0 && height != 1) {
-				System.out.println("Get Down");
 				current = current.getDown();
 				height--;
 				continue;
 			}
 
 			if (nextKey.compareTo(key) == 0) {
-				System.out.println("Arrived and Get Next");
 				current = current.getNext();
-				System.out.println("The node we are at is now: " + current.getKey());
 				while (height != 1) {
 					current = current.getDown();
 					height--;
 				}
-				System.out.println("Arrived at lowest level");
 				break;
 			}
 
 			if (nextKey.compareTo(key) > 0 && height == 1) {
 				current = current.getNext();
-				System.out.println("Arrived and break");
-				System.out.println("Current Key is: " + current.getKey());
-				System.out.println("The next key is correct: " + current.getNext().getKey());
 				break;
 			}
 		}
-
-		System.out.println("Outside loop: " + current.getKey());
-
-//		while (current.getPrevious().getKey().matchInfoP(key) == true && current.getPrevious() != null) {
-//
-//			System.out.println("printing key: " + current.getPrevious().getKey());
-//			temp.add(current.getPrevious());
-//			current = current.getPrevious();
-//		}
-//
-//		for (int i = temp.size() - 1; i >= 0; i--) {
-//			result.add(temp.remove(temp.size()-1));
-//		}
-
-//		return result;
-		return predeccesorsResult(result, current, key);
+		return predecessorsResult(result, current, key);
 
 	}
 
@@ -480,6 +436,29 @@ public class FlightList {
 	 * top. Each level should be printed on a separate line.
 	 */
 	public void print() {
+
+		FlightNode current = this.head;
+		int count = this.height;
+
+		while (count > 0) {
+			FlightNode header = current;
+
+			while (current != null && current.getNext() != null && current.getNext().getKey().compareTo(this.tail.getKey()) != 0) {
+				System.out.print(current.getNext().getKey() + " " + current.getNext().getData() + "; ");
+				current = current.getNext();
+			}
+			System.out.println();
+			current = header;
+			current = current.getDown();
+			count--;
+		}
+
+	}
+
+	/**
+	 * Prints only the bottom level of the skip list
+	 */
+	public void printBottomLevel() {
 
 		FlightNode current = this.head;
 		FlightNode header = current;
@@ -494,7 +473,6 @@ public class FlightList {
 			System.out.println(current.getNext().getKey() + " " + current.getNext().getData());
 			current = current.getNext();
 		}
-
 	}
 
 	/**
@@ -513,16 +491,18 @@ public class FlightList {
 			FlightNode current = this.head;
 			int levels = this.height;
 
-			while (levels != 1) {
+			while (levels > 0) {
+				FlightNode header = current;
+
+				while (current != null && current.getNext() != null && current.getNext().getKey().compareTo(this.tail.getKey()) != 0) {
+					out.write(current.getNext().getKey() + " " + current.getNext().getData() + "; ");
+					current = current.getNext();
+				}
+				out.write("");
+				current = header;
 				current = current.getDown();
 				levels--;
 			}
-
-			while (current.getNext() != tail) {
-				out.write(current.getNext().getKey() + " " + current.getNext().getData());
-				current = current.getNext();
-			}
-
 
 		} catch (IOException e) {
 			e.getMessage();
@@ -547,15 +527,8 @@ public class FlightList {
 		ArrayList<FlightNode> successors = successors(key);
 
 		int keyHour = getHour(key.getTime());
-		System.out.println("Key Hour: " + keyHour);
 		int upperThres = keyHour + timeFrame;
-		System.out.println(upperThres);
 		int lowerThres = keyHour - timeFrame;
-		System.out.println(lowerThres);
-
-
-		System.out.println("Size pre =  " + predecessors.size());
-		System.out.println("Size suc =  " + successors.size());
 
 		for (int i = 0; i < predecessors.size(); i++) {
 			FlightNode current = predecessors.get(i);
@@ -571,22 +544,21 @@ public class FlightList {
 
 		for (int i = 0; i < successors.size(); i++) {
 			FlightNode current = successors.get(i);
-			System.out.println("Current Key: " + current.getKey());
 			int flightTime = getHour(current.getKey().getTime());
-			System.out.println("Flight time: " + flightTime);
 			if (flightTime <= upperThres) {
 				flights.add(current);
 			}
 		}
-
-//		for (int i = 0; i < flights.size(); i++) {
-//			System.out.println("Printing contents: " + flights.get(i).getKey());
-//		}
-
 		return flights;
 	}
 
-	public FlightNode findFlight(FlightKey key) {
+
+	/**
+	 * Private method returns find the flight node of the given key
+	 * @param key
+	 * @return
+	 */
+	private FlightNode findFlight(FlightKey key) {
 
 		FlightNode current = this.head;
 
@@ -603,24 +575,20 @@ public class FlightList {
 			} else if (nextKey.compareTo(key) < 0) {
 				current = current.getNext();
 			}
-
 		}
-
 		return null;
 	}
 
+	/**
+	 * Private method gets the hour of a particular flight time
+	 * @param time
+	 * @return
+	 */
 	private static int getHour(String time) {
 
 		String[] parse = time.split(":");
 		int hour = Integer.parseInt(parse[0]);
 		return hour;
 	}
-
-
-
-
-
-
-
 
 }

@@ -1,8 +1,11 @@
 package skipLists;
 
 /**
- * Represents the key in the FlightNode. Stores origin, destination, date and
+ * Represents the key in the FlightNode.
+ * Stores origin, destination, date and
  * time. Implements Comparable<FlightKey>.
+ *
+ * Origin and destination is by airport code
  */
 public class FlightKey implements Comparable<FlightKey> {
 
@@ -37,26 +40,41 @@ public class FlightKey implements Comparable<FlightKey> {
 
 	}
 
-
+	/**
+	 * Returns the origin code of the flight
+	 * @return
+	 */
 	public String getOrigin() {
 		return this.orig;
 	}
 
+	/**
+	 * Returns the destination code of the flight
+	 * @return
+	 */
 	public String getDest() {
 		return this.dest;
 	}
 
+	/**
+	 * Returns the date of the flight
+	 * @return
+	 */
 	public String getDate() {
 		return this.date;
 	}
 
+	/**
+	 * Returns the time of the flight (24hour clock)
+	 * @return
+	 */
 	public String getTime() {
 		return this.time;
 	}
 
 
 	/**
-	 * Compares a given flight key with the one given as a parameter.
+	 * Compares a given flight key with another key given as the parameter.
 	 * @param other
 	 * @return -1, if this key is < other, > -1 if the opposite, and 0 if equal.  </>
 	 */
@@ -82,6 +100,14 @@ public class FlightKey implements Comparable<FlightKey> {
 		return result0; // don't forget to change it
 	}
 
+	/**
+	 * Compares a given flight key with another key given as parameter
+	 *
+	 * Returns true if origin, destination, date is the same and flight time of
+	 * flight key passed as parameter is later
+	 * @param other
+	 * @return
+	 */
 	public boolean matchInfoS(FlightKey other) {
 
 		int result0 = this.orig.compareTo(other.orig);
@@ -96,6 +122,14 @@ public class FlightKey implements Comparable<FlightKey> {
 		return false;
 	}
 
+	/**
+	 * Compares a given flight key with another key given as parameter
+	 *
+	 * Retruns true if origin, destination, data is the same and flight time of
+	 * the flight key passed as parameter is earlier
+	 * @param other
+	 * @return
+	 */
 	public boolean matchInfoP(FlightKey other) {
 
 		int result0 = this.orig.compareTo(other.orig);
